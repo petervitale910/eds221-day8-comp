@@ -7,7 +7,8 @@ editor_options:
 ---
 Attach packages
 ```{r}
-pacman::p_load("tidyverse", "here", "janitor", "ggthemes")
+pacman::p_load("tidyverse", "here", "janitor", "ggthemes",
+               "paletteer")
 ```
 
 
@@ -104,5 +105,68 @@ ggplot(data = lizard_counts,
   geom_col()+
   labs( x = "Individuals (n)",
         y = "Species Common Name")
+```
+
+## advanced ggplot customization 
+
+```{r}
+ggplot(lizards , 
+       aes(x = total_length , y = weight))+
+  geom_point()+
+  scale_x_continuous(breaks = c(0, 250, 500), 
+                     limits = c(0,500))+#continuous data
+  scale_y_continuous(breaks = seq(from = 0,
+                                  to = 70,
+                                  by = 10),#cool, axis along every 10
+                     limits = c(0,70))+ 
+  labs(x = "Total length (mm)", 
+       y = "Weight (Grams)")+
+  theme_clean()
+```
+
+```{r}
+ggplot(lizards, aes(x = total_length , y = weight))+
+  geom_point()+
+  scale_x_log10() #log scale
+```
+
+
+```{r}
+#counting lizards caught per day 
+lizard_counts <- lizards %>% 
+  mutate(date = lubridate::mdy(date)) %>% 
+  count(date)
+
+ggplot(lizard_counts, aes(x = date, y = n))+
+  geom_line()+
+  scale_x_date(breaks = scales::breaks_width("2 years"),
+               labels = scales::label_date("%Y"))
+```
+### customization of aesthetics with "scale_function 
+```{r}
+ggplot(lizards, aes(x = total_length, y = weight))+
+  geom_point(aes(color = weight))+
+  scale_color_gradient(low = "#F1D6B8", 
+                       high = "#FBACBE")
+
+#or
+
+ggplot(lizards, aes(x = total_length, y = weight))+
+  geom_point(aes(color = weight))+
+  scale_color_gradientn(colors = c("orange", "red","purple", "navy", "black"))
+
+#Might want to bin them 
+
+ggplot(data = lizards,
+       aes(x = total_length, 
+           y = weight))+
+  geom_point(aes(color = weight))+
+  scale_color_steps(low = "red", high = "navy",
+                    breaks = seq(0, 80, by = 5))
+```
+
+```{r}
+ggplot( data = lizards,
+        aes)
 ```
 
