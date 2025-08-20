@@ -1,0 +1,108 @@
+---
+title: "GGplot practice"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: inline
+---
+Attach packages
+```{r}
+pacman::p_load("tidyverse", "here", "janitor", "ggthemes")
+```
+
+
+#### GGplot basics
+Read in lizard data
+
+```{r}
+lizards <- read_csv(here("data_tidy","lizards.csv"))
+```
+
+### The essentials
+
+```{r}
+ggplot(lizards, aes(x = total_length , y = weight))+
+  geom_point() #very basic
+
+#can do 3 ways 
+
+ggplot(lizards)+
+  geom_point(aes(x = total_length, 
+                 y = weight))
+
+ggplot()+
+  geom_point(data = lizards , aes(x = total_length, y = weight)) #oh you actually have to specify data
+```
+
+can swap geometries
+```{r}
+ggplot(lizards, aes(x = total_length , y = weight))+
+  geom_line()
+```
+
+
+some geoms only need one axis
+
+```{r}
+ggplot(lizards, aes(x = total_length ))+ 
+         geom_histogram()
+```
+
+Jitterplots are usually best with one cat and one continuous var
+
+```{r}
+ggplot(lizards, aes(x = weight, y = common_name))+
+  geom_jitter()
+```
+
+
+#### Aesthetic mapping
+
+dont need to use aes()
+
+```{r}
+ggplot(lizards, aes(x= weight))+
+  geom_histogram(color = "khaki1", 
+                 fill = "#143109",
+                 alpha = .5,
+                 linetype = "dotted") #transparency)
+```
+
+##Updating aesthetics based on variables
+in that case we need to use aes()
+
+```{r}
+ggplot(lizards, aes( x= total_length, y = weight))+
+  geom_point(aes(color = common_name, #inside aes = apply different values accross data outside = apply same values
+                 size = total_length), alpha = .3)+ #alpha outside aes
+  theme(legend.position = "none")
+```
+
+#### Themes
+
+  
+```{r}
+ggplot(lizards, aes(x = weight, y = site))+
+  geom_jitter(aes(color = common_name))+
+  theme_solarized(light = FALSE)+
+  scale_color_solarized()+
+  labs( x = "Weight (grams)", 
+        y = "Study Site ID",
+        title = "Lizard weights across sites at Jordama",
+        color = "Species")+
+  theme(plot.title = element_text(hjust = 0))
+```
+
+
+## reorder data
+```{r}
+lizard_counts <-  lizards %>% 
+  count(common_name)
+
+ggplot(data = lizard_counts, 
+       aes(x = n, y= fct_reorder(common_name, n)))+
+  geom_col()+
+  labs( x = "Individuals (n)",
+        y = "Species Common Name")
+```
+
